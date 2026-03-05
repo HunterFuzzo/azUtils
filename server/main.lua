@@ -30,7 +30,6 @@ end)
 
 -- Commande pour se revive soi-même
 RegisterCommand('reviveme', function(source, args, rawCommand)
-    -- On déclenche notre propre événement de réanimation
     TriggerEvent('esx_admin:revivePlayer', source)
 end, false)
 
