@@ -24,6 +24,7 @@ local speeds = {
     {Name = "Flash", val = 5.0}
 }
 local speedIndex = 2
+local coordsActive = false
 
 function OpenBaseMenu()
     if open then 
@@ -91,6 +92,20 @@ function OpenBaseMenu()
                                 SetEntityCollision(entity, true, true)
                                 FreezeEntityPosition(entity, false)
                                 SetEntityVelocity(entity, 0.0, 0.0, 0.0)
+                            end
+                        end
+                    end)
+
+                    
+
+                    -- Dans ton menu RageUI, sous le NoClip :
+                    Items:CheckBox("Afficher les Coordonnées", "Affiche X, Y, Z et Heading en bas de l'écran", coordsActive, {}, function(onSelected, isChecked)
+                        if onSelected then
+                            coordsActive = isChecked
+                            if coordsActive then
+                                exports['az_notify']:ShowNotification("Affichage des coordonnées ~g~activé")
+                            else
+                                exports['az_notify']:ShowNotification("Affichage des coordonnées ~r~désactivé")
                             end
                         end
                     end)
@@ -286,4 +301,31 @@ function RotationToDirection(rotation)
         z = math.sin(adjustedRotation.x)
     }
     return vector3(direction.x, direction.y, direction.z)
+end
+
+Citizen.CreateThread(function()
+    while true do
+        if coordsActive then
+            local pPed = PlayerPedId()
+            local pCoords = GetEntityCoords(pPed)
+            local pHeading = GetEntityHeading(pPed)
+            
+            -- On dessine le texte
+            DrawCoordsText(pCoords.x, pCoords.y, pCoords.z, pHeading)
+            Citizen.Wait(0) -- Très important pour éviter le clignotement
+        else
+            Citizen.Wait(500) -- On économise les ressources
+        end
+    end
+end)
+
+function DrawCoordsText(x, y, z, h)
+    SetTextFont(4)
+    SetTextScale(0.45, 0.45)
+    SetTextColour(255, 255, 255, 255)
+    SetTextOutline()
+    SetTextCentre(true)
+    BeginTextCommandDisplayText("STRING")
+    AddTextComponentSubstringPlayerName(string.format("~y~X:~s~ %.2f  ~y~Y:~s~ %.2f  ~y~Z:~s~ %.2f  ~y~H:~s~ %.2f", x, y, z, h))
+    EndTextCommandDisplayText(0.5, 0.95) -- Positionné en bas au centre
 end
