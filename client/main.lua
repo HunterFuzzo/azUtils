@@ -62,6 +62,18 @@ function OpenBaseMenu()
                         end
                     end)
 
+                    Items:AddButton("~r~Mode Low Life", "Vie à 5% et retrait Kevlar", {RightLabel = "🩸"}, function(onSelected)
+                        if onSelected then
+                            local pPed = PlayerPedId()
+
+                            -- Effets immédiats (Strict minimum)
+                            SetEntityHealth(pPed, 105) -- 100 = Mort, 105 = Très bas
+                            SetPedArmour(pPed, 0)      -- Enlève le Kevlar
+                            
+                            ESX.ShowNotification("~r~État critique appliqué.")
+                        end
+                    end)
+
                     -- Checkbox pour activer/désactiver
                     Items:CheckBox("Mode NoClip", "Z,S,Q,D + Caméra (Shift = Descendre / Espace = Monter)", noclipActive, {}, function(onSelected, isChecked)
                         if onSelected then
