@@ -5,7 +5,6 @@ mainMenu.Closed = function() open = false end
 local deleteGunActive = false
 local deleteGunHash = GetHashKey("WEAPON_SNSPISTOL_MK2")
 
--- Table des composants à ajouter
 local components = {
     "COMPONENT_SNSPISTOL_MK2_CLIP_02",
     "COMPONENT_AT_PI_FLSH_00",
@@ -63,17 +62,6 @@ function OpenBaseMenu()
                         end
                     end)
 
-                    Items:AddButton("~r~Mode Low Life", "Vie à 5% et retrait Kevlar", {RightLabel = "🩸"}, function(onSelected)
-                        if onSelected then
-                            local pPed = PlayerPedId()
-
-                            -- Effets immédiats (Strict minimum)
-                            SetEntityHealth(pPed, 105) -- 100 = Mort, 105 = Très bas
-                            SetPedArmour(pPed, 0)      -- Enlève le Kevlar
-                            
-                            ESX.ShowNotification("~r~État critique appliqué.")
-                        end
-                    end)
 
                     -- Checkbox pour activer/désactiver
                     Items:CheckBox("Mode NoClip", "Z,S,Q,D + Caméra (Shift = Descendre / Espace = Monter)", noclipActive, {}, function(onSelected, isChecked)
@@ -122,7 +110,25 @@ function OpenBaseMenu()
 
                     Items:AddSeparator("~b~Administration")
                     
-                    Items:AddButton("~r~Se suicider", "Mourir instantanément", {RightLabel = "💀"}, function(onSelected)
+                    Items:AddButton("Tp an (ID)", "Téléporter un joueur sur vous", {RightLabel = "→"}, function(onSelected)
+                        if onSelected then
+                            local id = KeyboardInput("ID du joueur", "", 5)
+                            if id and id ~= "" then
+                                TriggerServerEvent('az_admin:bringPlayer', tonumber(id))
+                            end
+                        end
+                    end)
+
+                    Items:AddButton("Tp to (ID)", "Se téléporter sur un joueur", {RightLabel = "→"}, function(onSelected)
+                        if onSelected then
+                            local id = KeyboardInput("ID du joueur", "", 5)
+                            if id and id ~= "" then
+                                TriggerServerEvent('az_admin:teleportToPlayer', tonumber(id))
+                            end
+                        end
+                    end)
+
+                    Items:AddButton("~r~Se suicider", "Mourir instantanément", {RightLabel = "→"}, function(onSelected)
                         if onSelected then
                             SetEntityHealth(PlayerPedId(), 0)
                             TriggerServerEvent('esx:onPlayerDeath')
@@ -130,8 +136,14 @@ function OpenBaseMenu()
                         end
                     end)
 
+                    Items:AddButton("TP Tous sur moi", "Téléporter tous les joueurs connectés sur votre position", {RightLabel = "→"}, function(onSelected)
+                        if onSelected then
+                            TriggerServerEvent('az_admin:teleportAllToMe')
+                        end
+                    end)
+
                     -- Tes autres boutons (Revive, etc.) restent ici...
-                    Items:AddButton("Se réanimer", nil, {RightLabel = "✚"}, function(onSelected)
+                    Items:AddButton("Se réanimer", nil, {RightLabel = "→"}, function(onSelected)
                         if onSelected then TriggerEvent('esx_admin:forceRevive') end
                     end)
 
@@ -289,6 +301,23 @@ AddEventHandler('esx_admin:forceRevive', function()
     ESX.ShowNotification("~g~Réanimation réussie !")
 end)
 
+RegisterNetEvent('az_admin:teleportToCoords')
+AddEventHandler('az_admin:teleportToCoords', function(coords)
+    local playerPed = PlayerPedId()
+    
+    -- Effet de transition fluide
+    DoScreenFadeOut(500)
+    while not IsScreenFadedOut() do Wait(0) end
+    
+    -- Téléportation (On met z+0.5 pour éviter d'être sous le sol)
+    SetEntityCoords(playerPed, coords.x, coords.y, coords.z + 0.5, false, false, false, false)
+    
+    Wait(500)
+    DoScreenFadeIn(500)
+    
+    ESX.ShowNotification("~b~Vous avez été téléporté par un administrateur.")
+end)
+
 function RotationToDirection(rotation)
     local adjustedRotation = {
         x = (math.pi / 180) * rotation.x,
@@ -327,5 +356,5 @@ function DrawCoordsText(x, y, z, h)
     SetTextCentre(true)
     BeginTextCommandDisplayText("STRING")
     AddTextComponentSubstringPlayerName(string.format("~y~X:~s~ %.2f  ~y~Y:~s~ %.2f  ~y~Z:~s~ %.2f  ~y~H:~s~ %.2f", x, y, z, h))
-    EndTextCommandDisplayText(0.5, 0.95) -- Positionné en bas au centre
+    EndTextCommandDisplayText(0.5, 0.95)
 end

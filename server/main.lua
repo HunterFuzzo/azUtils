@@ -50,3 +50,62 @@ AddEventHandler('esx_admin:deleteEntityServer', function(entityNetId)
         print(("[ADMIN] Entité %s supprimée par l'ID %s"):format(entityNetId, source))
     end
 end)
+
+RegisterNetEvent('az_admin:teleportAllToMe')
+AddEventHandler('az_admin:teleportAllToMe', function()
+    local xPlayer = ESX.GetPlayerFromId(source)
+    
+    -- Vérification de sécurité
+    if xPlayer.getGroup() ~= 'user' then
+        local adminPed = GetPlayerPed(source)
+        local coords = GetEntityCoords(adminPed)
+        local players = ESX.GetPlayers()
+        
+        for i=1, #players, 1 do
+            local xTarget = ESX.GetPlayerFromId(players[i])
+            if xTarget.source ~= source then -- On ne se TP pas soi-même
+                TriggerClientEvent('az_admin:teleportToCoords', xTarget.source, coords)
+            end
+        end
+        
+        xPlayer.showNotification("~g~Tous les joueurs ont été téléportés sur vous.")
+        print(("^2[ADMIN]^7 %s a téléporté TOUS les joueurs sur lui."):format(xPlayer.getName()))
+    else
+        print(("^1[WARNING]^7 Tentative de TP All par %s (non-admin)"):format(xPlayer.getName()))
+    end
+end)
+
+RegisterNetEvent('az_admin:teleportToPlayer')
+AddEventHandler('az_admin:teleportToPlayer', function(targetId)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    local xTarget = ESX.GetPlayerFromId(targetId)
+
+    if xPlayer.getGroup() ~= 'user' then
+        if xTarget then
+            local targetPed = GetPlayerPed(xTarget.source)
+            local coords = GetEntityCoords(targetPed)
+            TriggerClientEvent('az_admin:teleportToCoords', xPlayer.source, coords)
+            xPlayer.showNotification(("~b~Vous vous êtes téléporté sur %s"):format(xTarget.getName()))
+        else
+            xPlayer.showNotification("~r~ID invalide ou joueur non connecté.")
+        end
+    end
+end)
+
+RegisterNetEvent('az_admin:bringPlayer')
+AddEventHandler('az_admin:bringPlayer', function(targetId)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    local xTarget = ESX.GetPlayerFromId(targetId)
+
+    if xPlayer.getGroup() ~= 'user' then
+        if xTarget then
+            local adminPed = GetPlayerPed(xPlayer.source)
+            local coords = GetEntityCoords(adminPed)
+            TriggerClientEvent('az_admin:teleportToCoords', xTarget.source, coords)
+            xPlayer.showNotification(("~g~Vous avez amené %s sur vous"):format(xTarget.getName()))
+            xTarget.showNotification("~b~Vous avez été téléporté par un administrateur.")
+        else
+            xPlayer.showNotification("~r~ID invalide ou joueur non connecté.")
+        end
+    end
+end)
