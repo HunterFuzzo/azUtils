@@ -17,9 +17,9 @@ local components = {
 local noclipActive = false
 local noclipSpeed = 1.0
 local speeds = {
-    {Name = "Lent", val = 0.5},
+    {Name = "Slow", val = 0.5},
     {Name = "Normal", val = 1.0},
-    {Name = "Rapide", val = 2.5},
+    {Name = "Fast", val = 2.5},
     {Name = "Flash", val = 5.0}
 }
 local speedIndex = 2
@@ -39,7 +39,7 @@ function OpenBaseMenu()
                 mainMenu:IsVisible(function(Items)
                     
                     -- Checkbox pour le Delete Props Gun
-                    Items:CheckBox("Delete Props Gun", "Arme pour supprimer les entités (SNS MK2 Full)", deleteGunActive, {}, function(onSelected, isChecked)
+                    Items:CheckBox("Delete Props Gun", "Weapon to delete entities (SNS MK2 Full)", deleteGunActive, {}, function(onSelected, isChecked)
                         if onSelected then
                             deleteGunActive = isChecked
                             local playerPed = PlayerPedId()
@@ -53,18 +53,18 @@ function OpenBaseMenu()
                                     GiveWeaponComponentToPed(playerPed, deleteGunHash, GetHashKey(component))
                                 end
                                 
-                                ESX.ShowNotification("~g~Delete Gun Activé")
+                                ESX.ShowNotification("~g~Delete Gun Enabled")
                             else
                                 -- Enlever l'arme
                                 RemoveWeaponFromPed(playerPed, deleteGunHash)
-                                ESX.ShowNotification("~r~Delete Gun Désactivé")
+                                ESX.ShowNotification("~r~Delete Gun Disabled")
                             end
                         end
                     end)
 
 
                     -- Checkbox pour activer/désactiver
-                    Items:CheckBox("Mode NoClip", "Z,S,Q,D + Caméra (Shift = Descendre / Espace = Monter)", noclipActive, {}, function(onSelected, isChecked)
+                    Items:CheckBox("NoClip Mode", "W,A,S,D + Camera (LSHIFT = Down / SPACE = Up)", noclipActive, {}, function(onSelected, isChecked)
                         if onSelected then
                             noclipActive = isChecked
                             local pPed = PlayerPedId()
@@ -87,20 +87,20 @@ function OpenBaseMenu()
                     
 
                     -- Dans ton menu RageUI, sous le NoClip :
-                    Items:CheckBox("Afficher les Coordonnées", "Affiche X, Y, Z et Heading en bas de l'écran", coordsActive, {}, function(onSelected, isChecked)
+                    Items:CheckBox("Show Coords", "Displays X, Y, Z and Heading at the bottom", coordsActive, {}, function(onSelected, isChecked)
                         if onSelected then
                             coordsActive = isChecked
                             if coordsActive then
-                                exports['az_notify']:ShowNotification("Affichage des coordonnées ~g~activé")
+                                exports['az_notify']:ShowNotification("Coords display ~g~enabled")
                             else
-                                exports['az_notify']:ShowNotification("Affichage des coordonnées ~r~désactivé")
+                                exports['az_notify']:ShowNotification("Coords display ~r~disabled")
                             end
                         end
                     end)
 
                     -- Liste pour changer la vitesse (uniquement si noclip actif)
                     if noclipActive then
-                        Items:AddList("Vitesse NoClip", speeds, speedIndex, "Changer la vitesse de vol", {}, function(Index, onSelected, onListChange)
+                        Items:AddList("NoClip Speed", speeds, speedIndex, "Change flight speed", {}, function(Index, onSelected, onListChange)
                             if onListChange then
                                 speedIndex = Index
                                 noclipSpeed = speeds[Index].val
@@ -110,40 +110,40 @@ function OpenBaseMenu()
 
                     Items:AddSeparator("~b~Administration")
                     
-                    Items:AddButton("Tp an (ID)", "Téléporter un joueur sur vous", {RightLabel = "→"}, function(onSelected)
+                    Items:AddButton("Bring (ID)", "Teleport a player to you", {RightLabel = "→"}, function(onSelected)
                         if onSelected then
-                            local id = KeyboardInput("ID du joueur", "", 5)
+                            local id = KeyboardInput("Player ID", "", 5)
                             if id and id ~= "" then
                                 TriggerServerEvent('az_admin:bringPlayer', tonumber(id))
                             end
                         end
                     end)
 
-                    Items:AddButton("Tp to (ID)", "Se téléporter sur un joueur", {RightLabel = "→"}, function(onSelected)
+                    Items:AddButton("TP to (ID)", "Teleport to a player", {RightLabel = "→"}, function(onSelected)
                         if onSelected then
-                            local id = KeyboardInput("ID du joueur", "", 5)
+                            local id = KeyboardInput("Player ID", "", 5)
                             if id and id ~= "" then
                                 TriggerServerEvent('az_admin:teleportToPlayer', tonumber(id))
                             end
                         end
                     end)
 
-                    Items:AddButton("~r~Se suicider", "Mourir instantanément", {RightLabel = "→"}, function(onSelected)
+                    Items:AddButton("~r~Suicide", "Die instantly", {RightLabel = "→"}, function(onSelected)
                         if onSelected then
                             SetEntityHealth(PlayerPedId(), 0)
                             TriggerServerEvent('esx:onPlayerDeath')
-                            ESX.ShowNotification("~r~Vous vous êtes suicidé.")
+                            ESX.ShowNotification("~r~You committed suicide.")
                         end
                     end)
 
-                    Items:AddButton("TP Tous sur moi", "Téléporter tous les joueurs connectés sur votre position", {RightLabel = "→"}, function(onSelected)
+                    Items:AddButton("Bring All", "Teleport all players to you", {RightLabel = "→"}, function(onSelected)
                         if onSelected then
                             TriggerServerEvent('az_admin:teleportAllToMe')
                         end
                     end)
 
                     -- Tes autres boutons (Revive, etc.) restent ici...
-                    Items:AddButton("Se réanimer", nil, {RightLabel = "→"}, function(onSelected)
+                    Items:AddButton("Revive self", nil, {RightLabel = "→"}, function(onSelected)
                         if onSelected then TriggerEvent('esx_admin:forceRevive') end
                     end)
 
@@ -174,7 +174,7 @@ CreateThread(function()
                             
                             if netId then
                                 TriggerServerEvent('esx_admin:deleteEntityServer', netId)
-                                ESX.ShowNotification("~g~Entité supprimée (Sync)")
+                                ESX.ShowNotification("~g~Entity deleted (Sync)")
                             else
                                 -- Si l'objet n'est pas réseau (rare), on le delete en local
                                 DeleteEntity(entity)
@@ -267,7 +267,7 @@ end, false)
 
 -- Configuration de la touche par défaut (ici 'F5')
 -- Tu peux mettre 'E', 'F6', 'INSERT', etc.
-RegisterKeyMapping('openadminmenu', 'Ouvrir le Menu Admin', 'keyboard', 'F5')
+RegisterKeyMapping('openadminmenu', 'Open Admin Menu', 'keyboard', 'F5')
 
 
 RegisterNetEvent('esx_admin:forceRevive')
@@ -298,7 +298,7 @@ AddEventHandler('esx_admin:forceRevive', function()
     Wait(500)
     DoScreenFadeIn(800)
     
-    ESX.ShowNotification("~g~Réanimation réussie !")
+    ESX.ShowNotification("~g~Revive successful!")
 end)
 
 RegisterNetEvent('az_admin:teleportToCoords')
@@ -315,7 +315,7 @@ AddEventHandler('az_admin:teleportToCoords', function(coords)
     Wait(500)
     DoScreenFadeIn(500)
     
-    ESX.ShowNotification("~b~Vous avez été téléporté par un administrateur.")
+    ESX.ShowNotification("~b~You have been teleported by an administrator.")
 end)
 
 function RotationToDirection(rotation)

@@ -10,13 +10,13 @@ AddEventHandler('esx_admin:revive', function(targetId)
         if xTarget then
             TriggerClientEvent('esx_ambulancejob:revive', xTarget.source)
             print(("^2[INFO]^7 L'admin %s a revive le joueur %s (ID: %s)"):format(xPlayer.getName(), xTarget.getName(), targetId))
-            xPlayer.showNotification(("~g~Vous avez revive le joueur %s"):format(xTarget.getName()))
+            xPlayer.showNotification(("~g~You revived player %s"):format(xTarget.getName()))
         else
-            xPlayer.showNotification("~r~ID invalide ou joueur non connecté.")
+            xPlayer.showNotification("~r~Invalid ID or player not connected.")
         end
     else
         print(("^1[WARNING]^7 Tentative de revive par %s (non-admin)"):format(xPlayer.getName()))
-        xPlayer.showNotification("~r~Vous n'avez pas la permission de faire ça.")
+        xPlayer.showNotification("~r~You don't have permission to do this.")
     end
 end)
 
@@ -68,7 +68,7 @@ AddEventHandler('az_admin:teleportAllToMe', function()
             end
         end
         
-        xPlayer.showNotification("~g~Tous les joueurs ont été téléportés sur vous.")
+        xPlayer.showNotification("~g~All players have been teleported to you.")
         print(("^2[ADMIN]^7 %s a téléporté TOUS les joueurs sur lui."):format(xPlayer.getName()))
     else
         print(("^1[WARNING]^7 Tentative de TP All par %s (non-admin)"):format(xPlayer.getName()))
@@ -85,9 +85,9 @@ AddEventHandler('az_admin:teleportToPlayer', function(targetId)
             local targetPed = GetPlayerPed(xTarget.source)
             local coords = GetEntityCoords(targetPed)
             TriggerClientEvent('az_admin:teleportToCoords', xPlayer.source, coords)
-            xPlayer.showNotification(("~b~Vous vous êtes téléporté sur %s"):format(xTarget.getName()))
+            xPlayer.showNotification(("~b~You teleported to %s"):format(xTarget.getName()))
         else
-            xPlayer.showNotification("~r~ID invalide ou joueur non connecté.")
+            xPlayer.showNotification("~r~Invalid ID or player not connected.")
         end
     end
 end)
@@ -102,10 +102,10 @@ AddEventHandler('az_admin:bringPlayer', function(targetId)
             local adminPed = GetPlayerPed(xPlayer.source)
             local coords = GetEntityCoords(adminPed)
             TriggerClientEvent('az_admin:teleportToCoords', xTarget.source, coords)
-            xPlayer.showNotification(("~g~Vous avez amené %s sur vous"):format(xTarget.getName()))
-            xTarget.showNotification("~b~Vous avez été téléporté par un administrateur.")
+            xPlayer.showNotification(("~g~You brought %s to you"):format(xTarget.getName()))
+            xTarget.showNotification("~b~You have been teleported by an administrator.")
         else
-            xPlayer.showNotification("~r~ID invalide ou joueur non connecté.")
+            xPlayer.showNotification("~r~Invalid ID or player not connected.")
         end
     end
 end)
