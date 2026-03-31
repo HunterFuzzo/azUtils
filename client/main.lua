@@ -131,6 +131,15 @@ Citizen.CreateThread(function()
                     end
                 end)
 
+                Items:AddButton("1 HP", "Put your health at 1hp", {RightLabel = "→"}, function(onSelected)
+                    if onSelected then
+                        local playerPed = PlayerPedId()
+                        SetEntityHealth(playerPed, 101)
+                        
+                        ESX.ShowNotification("You are at ~r~1 HP")
+                    end
+                end)
+
                 Items:AddButton("~r~Suicide", "Die instantly", {RightLabel = "→"}, function(onSelected)
                     if onSelected then
                         SetEntityHealth(pPed, 0)
