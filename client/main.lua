@@ -143,7 +143,7 @@ Citizen.CreateThread(function()
                 Items:AddButton("~r~Suicide", "Die instantly", {RightLabel = "→"}, function(onSelected)
                     if onSelected then
                         SetEntityHealth(pPed, 0)
-                        TriggerServerEvent('esx:onPlayerDeath')
+                        TriggerEvent('esx:onPlayerDeath')
                         ESX.ShowNotification("~r~You committed suicide.")
                     end
                 end)
